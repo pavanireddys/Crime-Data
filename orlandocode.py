@@ -1,15 +1,33 @@
+# make sure to install these packages before running:
+# pip install requests
+# pip install json
 
-import requests
-url = 'https://moto.data.socrata.com/resource/hirq-qvex.json'
- # call API
-myResponse = requests.get(url)
-print (myResponse.status_code)
-data = myResponse.json()
-print(data)
+import requests   #requests module is used to fetch the HTML code from a webpage
+import json   #json is a module used to convert the python dictionary into a JSON string that can be written into a file
 
-orlando_crime_data=[]
-for d in data:
-        new = dict()
+crime_data=[]
+
+#Here is creating a function that replaces the police_department_dataset_identifier for required crime data for particular city 
+
+def url_from_api(police_department_dataset_identifier):
+    
+    url = 'https://moto.data.socrata.com/resource/'+police_department_dataset_identifier+'.json'
+    
+ 
+    # call API
+    myResponse = requests.get(url)
+    #The url of the API contains dataset identifier is retrieved by the get function and stored in myResponse
+ 
+    data = myResponse.json()
+    #the data stored in the variable myResponse is converted into json by ginving myResponse.json() ind stored in variable data
+    
+    #print(data)
+    
+    #NOTE: Here I have used a for loop because to itetate the data of variable data
+    
+    for d in data:
+        new = dict()   #Creating a empty dictionary name as new for storing the data in required formate
+        
         new['address'] = d['address_1']
         new['case_number'] = d['case_number']
         new['city'] = d['city']
@@ -25,7 +43,19 @@ for d in data:
         new['longitude'] = d['longitude']
         new['parent_incident_type'] = d['parent_incident_type']
         new['updated_at'] = d['updated_at']
-        new['zip_code'] = d['zip']
-        orlando_crime_data.append(new)
+        
+        
+        crime_data.append(new)    #Append the new dictionary to a empty list crime_data
 
-print(orlando_crime_data)
+
+#Tthis is how to call function by giving the police_department_dataset_identifier of required city crime data
+
+url_from_api('hirq-qvex')   #Orlando Police Department dataset identifier is 'hirq-qvex'
+
+
+#file created for the purpose of storing data; orlando_crime_data.json stores crime data of orlando
+file = open("orlando_crime_data.json","w")
+
+json.dump(crime_data,file)   #dumps the crime_data by using json.dumps function
+file.close()  #closes the file
+
